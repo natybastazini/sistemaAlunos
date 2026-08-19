@@ -27,7 +27,9 @@ public class Main {
             switch (opcao) {
                 case 1 -> inserir();
                 case 2 -> consultarTodos();
-
+                case 3 -> buscar();
+                case 4 -> atualizar();
+                case 5 -> excluir();
             }
 
         } while (opcao != 0);
@@ -69,8 +71,20 @@ public class Main {
 
     private static void inserir(){
 
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Nome: ");
+        String nome = scanner.nextLine();
+
+        System.out.print("Email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Idade: ");
+        int idade = scanner.nextInt();
+
+
         String sql = "INSERT INTO Alunos (nome, email, idade)";
-        sql += " VALUES ('José', 'jose@teste.com', 40)";
+        sql += " VALUES ('" + nome +"', '" + email + "', " + idade + ")";
 
         try (var connection = DriverManager.getConnection(connectionString)){
             var statement = connection.createStatement();
@@ -102,5 +116,104 @@ public class Main {
         } catch (SQLException e){
             System.out.println("Erro ao consultar a tabela: " + e.getMessage());
         }
+    }
+
+    private static void buscar(){
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Digite o id, nome ou email do aluno que deseja buscar: ");
+        String busca = scanner.nextLine();
+
+        String sql = "SELECT id, nome, email, idade FROM Alunos WHERE nome LIKE '%" + busca + "%' OR email LIKE '%" + busca + "%'";
+
+        if (busca.matches("\\d+")) {
+            sql += " OR id = " + busca;
+        }
+
+        try (var connection = DriverManager.getConnection(connectionString)){
+            var statement = connection.createStatement();
+            var resultSet = statement.executeQuery(sql);
+
+            boolean encontrou = false;
+
+            while (resultSet.next()) {
+                encontrou = true;
+                var id = resultSet.getInt("id");
+                var nome = resultSet.getString("nome");
+                var email = resultSet.getString("email");
+                var idade = resultSet.getInt("idade");
+
+                System.out.printf("\nDados do Aluno: %s %s %s %s \n", id, nome, email, idade);
+            }
+
+            if (!encontrou) {
+                System.out.println("Aluno não encontrado.");
+            }
+
+        } catch (SQLException e){
+            System.out.println("Erro ao buscar aluno: " + e.getMessage());
+        }
+    }
+
+    private static void atualizar(){
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Digite o ID do aluno que deseja atualizar: ");
+        int id = scanner.nextInt();
+
+        scanner.nextLine();
+
+        System.out.print("Novo nome: ");
+        String nome = scanner.nextLine();
+
+        System.out.print("Novo email: ");
+        String email = scanner.nextLine();
+
+        System.out.print("Nova idade: ");
+        int idade = scanner.nextInt();
+
+        String sql = "UPDATE Alunos SET nome = '" + nome + "', email = '" + email + "', idade = " + idade;
+        sql += " WHERE id = " + id;
+
+        try (var connection = DriverManager.getConnection(connectionString)){
+            var statement = connection.createStatement();
+            int resultSet = statement.executeUpdate(sql);
+
+            if (resultSet > 0) {
+                System.out.println("Aluno atualizado com sucesso!");
+            } else {
+                System.out.println("Aluno não encontrado.");
+            }
+
+        } catch (SQLException e) {
+            System.out.println("Erro ao atualizar aluno: " + e.getMessage());
+        }
+
+    }
+
+    private static void excluir(){
+
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Digite o ID do aluno que deseja excluir: ");
+        int id = scanner.nextInt();
+
+        String sql = "DELETE FROM Alunos WHERE id = " + id;
+
+        try (var connection = DriverManager.getConnection(connectionString)){
+            var statement = connection.createStatement();
+            int resultSet = statement.executeUpdate(sql);
+
+            if (resultSet > 0) {
+                System.out.println("Aluno excluído com sucesso!");
+            } else {
+                System.out.println("Aluno não encontrado.");
+            }
+        } catch (SQLException e) {
+            System.out.println("Erro ao excluir aluno: " + e.getMessage());
+        }
+
     }
 }
