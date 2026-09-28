@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form th:action="@{/livros}"
+      th:object="${livro}"
+      method="post">
+    <label>Título</label>
+    <input type="text" th:field="*{titulo}">
+    <span th:if="${#fields.hasErrors('titulo')}"
+          th:errors="*{titulo}">
+    </span>
+    <br />
+    <label>Autor</label>
+    <input type="text" th:field="*{autor}">
+    <span th:if="${#fields.hasErrors('autor')}"
+          th:errors="*{autor}">
+    </span>
+    <br />
+    <label>ISBN</label>
+    <input type="text" th:field="*{isbn}">
+    <span th:if="${#fields.hasErrors('isbn')}"
+          th:errors="*{isbn}">
+    </span>
+    <br />
+    <label>Ano de Publicação</label>
+    <input type="text" th:field="*{anoPublicacao}">
+    <span th:if="${#fields.hasErrors('anoPublicacao')}"
+          th:errors="*{anoPublicacao}">
+    </span>
+    <br />
+    <label>Categoria</label>
+
+    <select th:field="*{categoria}">
+        <option value="">Selecione</option>
+        <option th:each="item: ${categorias}" th:value="${item}" th:text="${item}">Selecione</option>
+    </select>
+    <span th:errors="*{categoria}"></span>
+    <button type="submit">Cadastrar</button>
+</form>
+</body>
+</html>
